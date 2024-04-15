@@ -1,11 +1,13 @@
 import re
 
-def sum_integers(filename):
+
+def sum_integers(filename: int) -> int:
     with open(filename, 'r') as file:
         text = file.read()
         numbers = re.findall(r'\b\d+\b', text)
         print(fr'Found numbers : {numbers}')
         return sum(map(int, numbers))
+
 
 # Example usage:
 filename = "C:\\Automation\\New_folder\\test.txt"
