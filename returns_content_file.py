@@ -1,5 +1,5 @@
-
 import os
+
 
 # function without context manager
 def read_text_file_content(file_path: str) -> str | None:
@@ -49,7 +49,6 @@ def read_bin_file_content(file_path: str) -> bytes | None:
     except IOError as e:
         print(f"Error reading file '{file_path}': {e}")
         return None
-
 
 # rfc = read_text_file_content("C:\\Automation\\New_folder2\\testEmpty.txt")
 # rfc = read_text_file_content("C:\\Automation\\New_folder\\non_existent_file.txt")

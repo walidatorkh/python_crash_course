@@ -1,4 +1,4 @@
-def merge_and_sort_lists(list1, list2):
+def merge_and_sort_lists(list1: list, list2: list):
     """
     Merges two lists, removes duplicates, and returns a sorted list.
 

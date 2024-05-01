@@ -30,7 +30,7 @@ with open(csv_filename, mode="w", newline="") as file:
 print(f"File {csv_filename} successfully created.")
 
 
-def top_10_highest_salaries(csv_file):
+def top_10_highest_salaries(csv_file: object):
     """
 
     :type csv_file: object
@@ -77,7 +77,6 @@ def top_10_lowest_salaries(csv_file, output_csv_file):
             writer.writerow([full_name, title, phone_number, salary])
     file.close()
     return sorted(salaries, reverse=False)
-
 
 
 # using example
