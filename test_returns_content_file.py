@@ -1,102 +1,98 @@
+import tempfile
+from unittest import mock
+
 import pytest
 from returns_content_file import read_bin_file_content, read_text_file_content
 import os
-from pathlib import Path
 
 
-@pytest.fixture(scope="session")
-def global_tmp_path():
-    # Define the value of tmp_path here
-    tmp_path = "C:\\Automation\\New_folder\\"
-    return tmp_path
+# Test case: Reading content from an existing text file
+def test_read_valid_file():
+    with tempfile.NamedTemporaryFile(delete=False) as f:
+        f.write(b'Hello, World!')
+        temp_path = f.name
+    assert read_text_file_content(temp_path) == 'Hello, World!'
+    os.remove(temp_path)
 
 
-@pytest.fixture
-def temp_txt_file(global_tmp_path):
-    txt_content = "Hello, this is a text file."
-    file_path = Path(global_tmp_path) / "test1.txt"
-    with open(file_path, 'w') as file_content:
-        file_content.write(txt_content)
-        file_content.close()
-    return file_path
+# Test case: Attempting to read content from a non-existing file
+def test_read_non_existent_file():
+    assert read_text_file_content('non_existent.txt') is None
 
 
-@pytest.fixture
-def temp_txt_empty_file(global_tmp_path):
-    file_path = Path(global_tmp_path) / "test_empty.txt"
-    return file_path
+# Test case: Attempting to read content from a file with no permissions
+def test_read_no_permission_file():
+    # This part is tricky because Windows does not support the concept of read permissions in the same way as Unix
+    if os.name != 'nt':  # 'nt' indicates the Windows platform
+        with tempfile.NamedTemporaryFile(delete=False) as f:
+            f.write(b'Hello, World!')
+            temp_path = f.name
+        os.chmod(temp_path, 0o222)  # write-only permissions
+        assert read_text_file_content(temp_path) is None
+        os.chmod(temp_path, 0o777)  # reset permissions
+        os.remove(temp_path)
 
 
-@pytest.fixture
-def temp_bin_file(global_tmp_path):
-    file_content = b"Hello, this is a binary file."
-    file_path = Path(global_tmp_path) / "test1.bin"
+# Test case: Attempting to read content from a directory instead of a file
+def test_read_directory_instead_of_file():
+    with tempfile.TemporaryDirectory() as temp_dir:
+        assert read_text_file_content(temp_dir) is None
+
+
+# Test IOError exception
+def test_read_file_raises_ioerror():
+    with mock.patch('builtins.open', mock.mock_open()) as m:
+        m.side_effect = IOError
+        assert read_text_file_content('any_path') is None
+
+
+# Test PermissionError exception
+def test_read_file_raises_permission_error():
+    with mock.patch('builtins.open', mock.mock_open()) as m:
+        m.side_effect = PermissionError
+        assert read_text_file_content('any_path') is None
+
+
+# Test FileNotFoundError exception
+def test_read_file_raises_file_not_found_error():
+    with mock.patch('builtins.open', mock.mock_open()) as m:
+        m.side_effect = FileNotFoundError
+        assert read_text_file_content('any_path') is None
+
+
+# Test case: Reading content from an existing bin file
+def test_read_bin_file_content_existing_file(tmp_path):
+    # Arrange: Create a temporary binary file with content
+    content = b"Hello, World!"
+    file_path = tmp_path / "test_file.bin"
     with open(file_path, 'wb') as file:
-        file.write(file_content)
-        file.close()
-    return file_path
+        file.write(content)
+
+    # Act: Call the function to read the file content
+    result = read_bin_file_content(file_path)
+
+    # Assert: Check if the content matches
+    assert result == content
 
 
-# Test cases
+# Test case: Reading content from a non-existing bin file
+def test_read_bin_file_content_non_existing_file(tmp_path):
+    # Arrange: Use a non-existing file path
+    file_path = tmp_path / "non_existing_file.bin"
+
+    # Act: Call the function to read the file content
+    result = read_bin_file_content(file_path)
+
+    # Assert: Check if the result is None
+    assert result is None
 
 
-def test_read_text_file_content_exists(temp_txt_file):
-    content = read_text_file_content(temp_txt_file)
-    assert content == "Hello, this is a text file."
-
-
-def test_read_text_file_no_content_exists(temp_txt_empty_file):
-    content = read_text_file_content(temp_txt_empty_file)
-    assert content is None
-
-
-def test_read_text_file_content_nonexistent(global_tmp_path):
-    non_existent_file = Path(global_tmp_path) / "non_existent_file.txt"
-    content = read_text_file_content(non_existent_file)
-    assert content is None
-
-
-def test_read_text_file_content_io_error(global_tmp_path):
-    # Attempt to read a directory as a file
-    with pytest.raises(IOError):
-        read_text_file_content(global_tmp_path)
-
-
-def test_read_bin_file_content_exists(temp_bin_file):
-    content = read_bin_file_content(temp_bin_file)
-    assert content == b"Hello, this is a binary file."
-
-
-def test_read_bin_file_content_nonexistent(global_tmp_path):
-    non_existent_file = Path(global_tmp_path) / "non_existent_file.bin"
-    content = read_bin_file_content(non_existent_file)
-    assert content is None
-
-
-def test_read_bin_file_content_io_error(global_tmp_path):
-    # Attempt to read a directory as a file
-    directory_path = global_tmp_path + "directory"
-    # directory_path.mkdir()
+# Test case: Reading content from a directory
+def test_read_bin_file_content_directory(tmp_path):
+    # Arrange: Create a temporary directory
+    directory_path = tmp_path / "test_directory"
     os.makedirs(directory_path)
-    with pytest.raises(IOError):
+
+    # Act and Assert: Check if IsADirectoryError is raised
+    with pytest.raises(IsADirectoryError):
         read_bin_file_content(directory_path)
-
-
-# Finalizer to remove the directory after the test
-@pytest.fixture(autouse=True)
-def cleanup_tmp_dir(request, global_tmp_path):
-    tmp_path = Path(global_tmp_path)
-    yield
-    # Remove the directory after the test
-    for item in tmp_path.iterdir():
-        if item.is_dir():
-            os.rmdir(item)
-
-
-@pytest.fixture(autouse=True)
-def cleanup_tmp_files(request, global_tmp_path):
-    tmp_path = Path(global_tmp_path)
-    yield
-    for item in tmp_path.iterdir():
-        if item.is_file():
-            os.remove(item)

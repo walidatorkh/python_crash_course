@@ -10,7 +10,7 @@ def sum_integers(filename: int) -> int:
 
 
 # Example usage:
-filename = "C:\\Automation\\New_folder\\test.txt"
-total_sum = sum_integers(filename)
-if total_sum is not None:
-    print("Total sum of integers in the file:", total_sum)
+# filename = "C:\\Automation\\New_folder\\test.txt"
+# total_sum = sum_integers(filename)
+# if total_sum is not None:
+#     print("Total sum of integers in the file:", total_sum)
