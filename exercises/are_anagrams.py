@@ -2,6 +2,19 @@ import pytest
 
 
 def are_anagrams(str1: str, str2: str):
+    """
+        Checks whether two strings are anagrams.
+
+        Parameters:
+        - str1 (str): The first string to check.
+        - str2 (str): The second string to check.
+
+        Returns:
+        - bool: True if the strings are anagrams, False otherwise.
+
+        Raises:
+        - ValueError: If either input argument is not a string.
+    """
     if not isinstance(str1, str) or not isinstance(str2, str):
         raise ValueError("Both inputs must be strings")
     str1 = str1.replace(" ", "").lower()
