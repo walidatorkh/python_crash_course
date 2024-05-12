@@ -17,8 +17,10 @@ def are_anagrams(str1: str, str2: str):
 
 @pytest.mark.parametrize("str1, str2, expected", [
     ("listen", "silent", True),  # "listen" и "silent" are anagrams
+    ("debit card", "bad credit", True),  # "debit card" и "bad credit" are long anagrams
     ("Hello", "Olelh", True),  # "Hello" и "Olelh" are anagrams if not case sencitive
     ("test", "taste", False),  # "test" и "taste" are not anagrams
+    ("abc", "abcd", False),  # "abc" и "abcd" are not anagrams
     (" ", " ", True),  # two space are anagrams
     ("", "", True),  # two empty characters are anagrams
 ])
