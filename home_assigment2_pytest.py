@@ -127,7 +127,7 @@ class TestHomeAssignment2:
             if response.ok:
                 # Parse JSON response
                 json_response = response.json()
-
+                print(json_response)
                 # Extract text content from search results and concatenate
                 text_content = " ".join([s["snippet"] for s in json_response["query"]["search"]])
 
@@ -137,7 +137,7 @@ class TestHomeAssignment2:
                 # Tokenize the text content into words while excluding delimiters
                 words = re.split('[' + re.escape(delimiters) + ']+', text_content)
 
-                # Use defaultdict to store word counts
+                # Use default dict to store word counts
                 word_counts = defaultdict(int)
                 for word in words:
                     word_counts[word] += 1
