@@ -84,7 +84,7 @@ def test_read_bin_file_content_non_existent():
 
 # Test reading a directory (should raise an exception)
 def test_read_bin_file_content_is_directory():
-    dir_path = '.'
+    dir_path = '..'
 
     with pytest.raises(IsADirectoryError):
         read_bin_file_content(dir_path)
